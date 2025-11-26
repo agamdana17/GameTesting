@@ -8,7 +8,7 @@ pipeline {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-cred',
-                    url: 'https://github.com/agamdana17/testinggame.git'
+                    url: 'https://github.com/agamdana17/GameTesting.git'
             }
         }
 
