@@ -1,9 +1,10 @@
 pipeline {
-    agent { label 'Windows' }
+    agent none
 
     stages {
 
-        stage('Checkout Source Code') {
+        stage('Checkout') {
+            agent { label 'Windows' }
             steps {
                 git branch: 'main',
                     credentialsId: 'github-cred',
@@ -12,33 +13,23 @@ pipeline {
         }
 
         stage('Run Unity NUnit Tests') {
+            agent { label 'Windows' }
             steps {
-                bat """
-                "C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.47f1\\Editor\\Unity.exe" ^
-                -runTests ^
-                -projectPath "%WORKSPACE%" ^
-                -testResults "%WORKSPACE%\\TestResults.xml" ^
-                -testResultsFormat junit ^
-                -testPlatform editmode ^
-                -batchmode ^
-                -quit
-                """
+                bat "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.47f1\\Editor\\Unity.exe\" " +
+                    "-runTests " +
+                    "-projectPath \"%cd%\" " +
+                    "-testResults \"%cd%\\TestResults.xml\" " +
+                    "-testResultsFormat junit " +
+                    "-testPlatform editmode " +
+                    "-batchmode -quit"
             }
         }
 
         stage('Publish NUnit Results') {
+            agent { label 'Windows' }
             steps {
-                junit 'TestResults.xml'
+                nunit testResultsPattern: 'Assets/Tests/TestResults.xml'
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline testing game drag & drop selesai"
-        }
-        failure {
-            echo "Terdapat kegagalan pada pengujian game"
         }
     }
 }
